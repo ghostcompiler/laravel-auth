@@ -19,10 +19,6 @@ jobs:
       matrix:
         include:
           - php: "8.2"
-            laravel: "^9.0"
-            testbench: "^7.0"
-            phpunit: "^9.6"
-          - php: "8.2"
             laravel: "^10.0"
             testbench: "^8.0"
             phpunit: "^10.5"

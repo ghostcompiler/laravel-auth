@@ -5,10 +5,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "illuminate/http": "^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
-        "illuminate/mail": "^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
-        "illuminate/support": "^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
-        "illuminate/view": "^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "illuminate/http": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "illuminate/mail": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "illuminate/view": "^10.0 || ^11.0 || ^12.0 || ^13.0",
         "laravel/socialite": "^5.0",
         "lbuchs/webauthn": "^2.2"
     },
@@ -23,7 +23,7 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0",
+        "orchestra/testbench": "^8.0 || ^9.0 || ^10.0 || ^11.0",
         "phpunit/phpunit": "^9.6 || ^10.5 || ^11.5"
     },
     "scripts": {

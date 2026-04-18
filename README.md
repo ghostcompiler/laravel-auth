@@ -15,7 +15,7 @@ This package does not replace your login system. It adds security layers on top 
 ## Requirements
 
 - PHP 8.2+
-- Laravel 9, 10, 11, 12, or 13
+- Laravel 10, 11, 12, or 13
 - database access for package tables
 - HTTPS for browser passkey flows
 - `laravel/socialite` support for social login helpers
