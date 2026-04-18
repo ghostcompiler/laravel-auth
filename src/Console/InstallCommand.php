@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class InstallCommand extends Command
 {
-    protected $signature = 'laravel-auth:install {--force : Overwrite any existing published files}';
+    protected $signature = 'ghost:laravel-auth {--force : Overwrite existing LaravelAuth files}';
 
     protected $description = 'Install LaravelAuth by publishing its config and migrations';
 

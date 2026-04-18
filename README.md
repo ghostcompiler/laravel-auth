@@ -1,3 +1,13 @@
+<p align="center">
+  <img src="assets/logo/logo.png" alt="Laravel Auth Logo" width="180">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-10%20to%2013-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/Built%20With-Laravel%20Auth-0F172A?style=for-the-badge" alt="Laravel Auth">
+</p>
+
 # LaravelAuth
 
 Headless Laravel authentication hardening with:
@@ -24,11 +34,17 @@ This package does not replace your login system. It adds security layers on top 
 
 ```bash
 composer require ghostcompiler/laravel-auth
-php artisan laravel-auth:install
+php artisan ghost:laravel-auth
 php artisan migrate
 ```
 
-What `laravel-auth:install` publishes:
+Force republishing if you want to overwrite previously published files:
+
+```bash
+php artisan ghost:laravel-auth --force
+```
+
+What `ghost:laravel-auth` publishes:
 
 - `config/laravel-auth.php`
 - one package migration file
@@ -66,7 +82,7 @@ Then in the app:
 
 ```bash
 composer require ghostcompiler/laravel-auth
-php artisan laravel-auth:install
+php artisan ghost:laravel-auth
 php artisan migrate
 php artisan optimize:clear
 ```
