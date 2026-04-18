@@ -1,0 +1,75 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  COMPOSER_ROOT_VERSION: dev-main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: "8.2"
+            laravel: "^9.0"
+            testbench: "^7.0"
+            phpunit: "^9.6"
+          - php: "8.2"
+            laravel: "^10.0"
+            testbench: "^8.0"
+            phpunit: "^10.5"
+          - php: "8.3"
+            laravel: "^11.0"
+            testbench: "^9.0"
+            phpunit: "^10.5"
+          - php: "8.3"
+            laravel: "^12.0"
+            testbench: "^10.0"
+            phpunit: "^11.5"
+          - php: "8.4"
+            laravel: "^13.0"
+            testbench: "^11.0"
+            phpunit: "^11.5"
+
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: ctype, curl, dom, fileinfo, json, libxml, mbstring, openssl, pdo_sqlite, sqlite3, tokenizer
+
+      - name: Validate Composer
+        run: composer validate --strict
+
+      - name: Configure Laravel test matrix
+        run: |
+          composer require \
+            "illuminate/http:${{ matrix.laravel }}" \
+            "illuminate/mail:${{ matrix.laravel }}" \
+            "illuminate/support:${{ matrix.laravel }}" \
+            "illuminate/view:${{ matrix.laravel }}" \
+            "orchestra/testbench:${{ matrix.testbench }}" \
+            "phpunit/phpunit:${{ matrix.phpunit }}" \
+            --dev \
+            --no-interaction \
+            --no-update
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --with-all-dependencies
+
+      - name: Run tests
+        run: vendor/bin/phpunit

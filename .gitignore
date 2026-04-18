@@ -1,0 +1,4 @@
+demo-app
+vendor
+.DS_Store
+.phpunit.result.cache
