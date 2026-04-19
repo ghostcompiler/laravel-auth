@@ -7,6 +7,7 @@ use GhostCompiler\LaravelAuth\Support\WebAuthnPayload;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use lbuchs\WebAuthn\Binary\ByteBuffer;
 use lbuchs\WebAuthn\WebAuthn;
 use lbuchs\WebAuthn\WebAuthnException;
 use RuntimeException;
@@ -38,10 +39,14 @@ class WebAuthnService
             $excludeCredentialIds
         );
 
+        $rawChallenge = $webauthn->getChallenge();
+
         $challenge = app(ChallengeStore::class)->create(
             $user,
             'registration',
-            $webauthn->getChallenge(),
+            $rawChallenge instanceof ByteBuffer
+                ? $rawChallenge->getBinaryString()
+                : (string) $rawChallenge,
             (int) config('laravel-auth.webauthn.timeout', 240)
         );
 
@@ -116,10 +121,14 @@ class WebAuthnService
             (string) config('laravel-auth.webauthn.user_verification', 'preferred')
         );
 
+        $rawChallenge = $webauthn->getChallenge();
+
         $challenge = app(ChallengeStore::class)->create(
             $user,
             'authentication',
-            $webauthn->getChallenge(),
+            $rawChallenge instanceof ByteBuffer
+                ? $rawChallenge->getBinaryString()
+                : (string) $rawChallenge,
             (int) config('laravel-auth.webauthn.timeout', 240)
         );
 
