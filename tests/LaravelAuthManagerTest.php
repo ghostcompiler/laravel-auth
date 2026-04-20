@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 
 class LaravelAuthManagerTest extends TestCase
 {
@@ -139,6 +140,77 @@ class LaravelAuthManagerTest extends TestCase
 
         self::assertTrue($service->isTrusted($user, $sameRequest));
         self::assertFalse($service->isTrusted($user, $differentAgentRequest));
+    }
+
+    public function test_trusted_device_promotion_regenerates_the_session(): void
+    {
+        $user = User::query()->create([
+            'email' => 'trusted-session@example.test',
+            'password' => 'secret',
+            'laravel_auth_totp_secret' => Crypt::encryptString('JBSWY3DPEHPK3PXP'),
+            'laravel_auth_two_factor_enabled' => true,
+        ]);
+
+        $trustedRequest = Request::create('/', 'GET', [], [], [], [
+            'HTTP_USER_AGENT' => 'LaravelAuth Trusted Agent',
+            'REMOTE_ADDR' => '127.0.0.1',
+        ]);
+
+        $trustedDevices = $this->app->make(TrustedDeviceService::class);
+        $trustedDevices->trust($user, $trustedRequest, 'Trusted Browser');
+
+        $queuedCookie = collect(Cookie::getQueuedCookies())->last();
+        self::assertNotNull($queuedCookie);
+
+        $request = Request::create('/', 'GET', [], [
+            config('laravel-auth.trusted_devices.cookie') => $queuedCookie->getValue(),
+        ], [], [
+            'HTTP_USER_AGENT' => 'LaravelAuth Trusted Agent',
+            'REMOTE_ADDR' => '127.0.0.1',
+        ]);
+
+        $manager = new ConcreteLaravelAuthManager(
+            $this->app->make(TotpService::class),
+            $this->app->make(RecoveryCodeService::class),
+            $this->app->make(WebAuthnService::class),
+            $this->app->make(OtpChannelManager::class),
+            $this->app->make(SocialAuthService::class),
+            $trustedDevices,
+            $request
+        );
+
+        $originalSession = $this->app->make('session');
+        $tracker = (object) ['regenerated' => false];
+        $sessionSpy = new class($originalSession, $tracker) {
+            public function __construct(
+                private object $session,
+                private object $tracker
+            ) {
+            }
+
+            public function regenerate($destroy = false): mixed
+            {
+                $this->tracker->regenerated = true;
+
+                return $this->session->regenerate($destroy);
+            }
+
+            public function __call(string $method, array $arguments): mixed
+            {
+                return $this->session->{$method}(...$arguments);
+            }
+        };
+
+        $this->app->instance('session', $sessionSpy);
+
+        try {
+            session()->put('laravel_auth.state', AuthState::PasswordVerified->value);
+
+            self::assertSame(AuthState::FullyAuthenticated, $manager->syncAuthenticatedState($user));
+            self::assertTrue($tracker->regenerated);
+        } finally {
+            $this->app->instance('session', $originalSession);
+        }
     }
 
     public function test_email_otp_can_be_sent_and_verified(): void

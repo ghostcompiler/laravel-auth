@@ -445,6 +445,10 @@ class LaravelAuthManager implements LaravelAuthManagerContract
             session()->put($this->sessionKey($user), true);
             $this->setState(AuthState::FullyAuthenticated);
 
+            if (method_exists(session(), 'regenerate')) {
+                session()->regenerate();
+            }
+
             return AuthState::FullyAuthenticated;
         }
 
